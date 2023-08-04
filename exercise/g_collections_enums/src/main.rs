@@ -10,21 +10,39 @@
 //
 // You will need to complete 1b as well before you will be able to run this program successfully.
 
+#[derive(Debug)]
+enum Shot {
+    Bullseye,
+    Hit(f64),
+    Miss,
+}
+
 impl Shot {
     // Here is a method for the `Shot` enum you just defined.
-    fn points(self) -> i32 {
+    fn points(&self) -> i32 {
         // 1b. Implement this method to convert a Shot into points
         // - return 5 points if `self` is a `Shot::Bullseye`
         // - return 2 points if `self` is a `Shot::Hit(x)` where x < 3.0
         // - return 1 point if `self` is a `Shot::Hit(x)` where x >= 3.0
         // - return 0 points if `self` is a Miss
+
+        match self{
+            Shot::Bullseye => 5,
+            Shot::Hit(x) => if x < &3.0 {2} else {1},
+            // Shot::Hit => 1,
+            Shot::Miss => 0,
+        }
     }
 }
 
 fn main() {
     // Simulate shooting a bunch of arrows and gathering their coordinates on the target.
-    let arrow_coords: Vec<Coord> = get_arrow_coords(5);
+    let total_shots: u32 = 10;
+    let arrow_coords: Vec<Coord> = get_arrow_coords(total_shots);
+    let mut shot: Shot;
     let mut shots: Vec<Shot> = Vec::new();
+    
+    // println!("{:?}", shots);  // debug
 
     // 2. For each coord in arrow_coords:
     //
@@ -35,10 +53,43 @@ fn main() {
     //      - Between 1.0 and 5.0 -- `Shot::Hit(value)`
     //      - Greater than 5.0 -- `Shot::Miss`
 
+    for arrow in &arrow_coords {
+        // println!("{:?}", arrow.x);
+        // Coord::print_description( &Coord { x: arrow.x, y: arrow.y } );
+        arrow.print_description(); 
+        // println!("{:?}", Coord::distance_from_center(arrow))
 
-    let mut total = 0;
+        if Coord::distance_from_center(arrow) < 1.0 {
+            shot = Shot::Bullseye;
+            // println!("{:?}", shot)
+        } else if Coord::distance_from_center(arrow) >= 1.0 && Coord::distance_from_center(arrow) <= 5.0 {
+            shot = Shot::Hit(Coord::distance_from_center(arrow));
+            // println!("{:?}", shot)
+        } else {
+            shot = Shot::Miss;
+            // println!("{:?}", shot)
+        }
+        shots.push(shot);
+        // println!("{}", shot.points());
+    }
+
+    // println!("{:?}", shots);  // debug
+
+    // Outside the for loop
+    // Coord::print_description( &Coord { x: arrow_coords[i].x, y: arrow_coords[i].y } );
+    // println!("{:?}", arrow_coords[0].x);
+    
+    // debug
+    // println!("{:?}", shots[0]);
+    // println!("{:?}", Shot::points(Shot::Miss));
+    // println!("{:?}", Shot::points(&shots[0]));
+
     // 3. Finally, loop through each shot in shots and add its points to total
-
+    let mut total = 0;
+    for chota in &shots {
+        println!("{:?} {:?}", chota, Shot::points(&chota));  // debug
+        total += Shot::points(&chota);
+    }
     println!("Final point total is: {}", total);
 }
 
@@ -60,7 +111,6 @@ impl Coord {
             self.x,
             self.y);
     }
-
 }
 
 // Generate some random coordinates
